@@ -22,6 +22,7 @@
 - Auto Rob is Beta Only
 - All Colour Pickers Come With a Rainbow Option
 - Configs Load Automatically
+- Search Bar
 
 Combat:
     Aimbot:
