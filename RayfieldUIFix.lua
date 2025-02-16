@@ -24,7 +24,6 @@ local settingsTable = {
 		rayfieldOpen = {Type = 'bind', Value = 'K', Name = 'UI Keybind'},
 		-- buildwarnings
 		-- rayfieldprompts
-
 	},
 }
 
@@ -3349,7 +3348,6 @@ if Topbar:FindFirstChild('Settings') then
 			Elements.UIPageLayout:JumpTo(Elements['Settings'])
 		end)
 	end)
-
 end
 
 Topbar.Hide.MouseButton1Click:Connect(function()
@@ -3433,7 +3431,7 @@ if CEnabled and Main:FindFirstChild('Notice') then
 	TweenService:Create(Main.Notice.Title, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 0.1}):Play()
 end
 
-task.delay(4, function()
+task.delay(1, function()
 	RayfieldLibrary.LoadConfiguration()
 	if Main:FindFirstChild('Notice') and Main.Notice.Visible then
 		TweenService:Create(Main.Notice, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 100, 0, 25), Position = UDim2.new(0.5, 0, 0, -100), BackgroundTransparency = 1}):Play()
