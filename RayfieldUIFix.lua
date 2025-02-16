@@ -1355,6 +1355,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 	local Passthrough = false
 	Topbar.Title.Text = Settings.Name
 
+	Main.Selectable = true
+	Main.Active = true
 	Main.Size = UDim2.new(0, 420, 0, 100)
 	Main.Visible = true
 	Main.BackgroundTransparency = 1
@@ -3401,7 +3403,6 @@ function RayfieldLibrary:LoadConfiguration()
 	end
 
 	if CEnabled then
-		local notified
 		local loaded
 
 		local success, result = pcall(function()
@@ -3414,18 +3415,8 @@ function RayfieldLibrary:LoadConfiguration()
 				if isfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension) then
 					loaded = LoadConfiguration(readfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension))
 				end
-			else
-				notified = true
-				RayfieldLibrary:Notify({Title = "Configurations", Content = "We couldn't enable Configuration Saving as you are not using software with filesystem support.", Image = 4384402990})
 			end
 		end)
-
-		if success and loaded and not notified then
-			RayfieldLibrary:Notify({Title = "Rayfield Configurations", Content = "The configuration file for this script has been loaded from a previous session.", Image = 4384403532})
-		elseif not success and not notified then
-			warn('Configurations Error | '..tostring(result))
-			RayfieldLibrary:Notify({Title = "Configurations", Content = "We've encountered an issue loading your configuration correctly.\n\nCheck the Developer Console for more information.", Image = 4384402990})
-		end
 	end
 
 	globalLoaded = true
