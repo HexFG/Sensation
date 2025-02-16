@@ -3554,3 +3554,5 @@ if Main:FindFirstChild('Notice') and Main.Notice.Visible then
 	Main.Notice.Visible = false
 end
 end)
+
+return RayfieldLibrary
