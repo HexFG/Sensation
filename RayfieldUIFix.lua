@@ -14,7 +14,7 @@ if debugX then
 end
 
 local InterfaceBuild = 'Duck1'
-local Release = "Build 1.671"
+local Release = "Build 69420"
 local RayfieldFolder = "Duck"
 local ConfigurationFolder = RayfieldFolder.."/Configurations"
 local ConfigurationExtension = ".rfld"
@@ -35,7 +35,6 @@ local RunService = cloneref(game:GetService("RunService"))
 local useStudio = RunService:IsStudio() or false
 local settingsCreated = false
 local cachedSettings
-local prompt = useStudio and require(script.Parent.prompt) or loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Sirius/refs/heads/request/prompt.lua'))()
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
 local function loadSettings()
@@ -559,8 +558,7 @@ local dragOffsetMobile = 150
 
 Rayfield.DisplayOrder = 100
 
--- Thanks to Latte Softworks for the Lucide integration for Roblox
-local Icons = useStudio and require(script.Parent.icons) or loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/refs/heads/main/icons.lua'))()
+local Icons = loadstring(game:HttpGet('https://raw.githubusercontent.com/HexFG/Sensation/refs/heads/main/RayfieldIconsFix.lua'))()
 
 -- Variables
 local CFileName = nil
@@ -1289,14 +1287,14 @@ local function createSettings(window)
 		return
 	end
 
-	local newTab = window:CreateTab('Rayfield Settings', 0, true)
+	local newTab = window:CreateTab('Settings', 0, true)
 
-	if TabList['Rayfield Settings'] then
-		TabList['Rayfield Settings'].LayoutOrder = 1000
+	if TabList['Settings'] then
+		TabList['Settings'].LayoutOrder = 1000
 	end
 
-	if Elements['Rayfield Settings'] then
-		Elements['Rayfield Settings'].LayoutOrder = 1000
+	if Elements['Settings'] then
+		Elements['Settings'].LayoutOrder = 1000
 	end
 
 	-- Create sections and elements
@@ -2973,7 +2971,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 				end
 			end
 
-
 			Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
 				Toggle.Switch.BackgroundColor3 = SelectedTheme.ToggleBackground
 
@@ -3238,7 +3235,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 		createSettings(Window)
 	end)
 	
-	if not success then warn('Rayfield had an issue creating settings.') end
+	if not success then warn('An issue when creating settings has occured.') end
 	return Window
 end
 
@@ -3347,7 +3344,7 @@ if Topbar:FindFirstChild('Settings') then
 				end
 			end
 
-			Elements.UIPageLayout:JumpTo(Elements['Rayfield Settings'])
+			Elements.UIPageLayout:JumpTo(Elements['Settings'])
 		end)
 	end)
 
@@ -3419,15 +3416,15 @@ function RayfieldLibrary:LoadConfiguration()
 				end
 			else
 				notified = true
-				RayfieldLibrary:Notify({Title = "Rayfield Configurations", Content = "We couldn't enable Configuration Saving as you are not using software with filesystem support.", Image = 4384402990})
+				RayfieldLibrary:Notify({Title = "Configurations", Content = "We couldn't enable Configuration Saving as you are not using software with filesystem support.", Image = 4384402990})
 			end
 		end)
 
 		if success and loaded and not notified then
 			RayfieldLibrary:Notify({Title = "Rayfield Configurations", Content = "The configuration file for this script has been loaded from a previous session.", Image = 4384403532})
 		elseif not success and not notified then
-			warn('Rayfield Configurations Error | '..tostring(result))
-			RayfieldLibrary:Notify({Title = "Rayfield Configurations", Content = "We've encountered an issue loading your configuration correctly.\n\nCheck the Developer Console for more information.", Image = 4384402990})
+			warn('Configurations Error | '..tostring(result))
+			RayfieldLibrary:Notify({Title = "Configurations", Content = "We've encountered an issue loading your configuration correctly.\n\nCheck the Developer Console for more information.", Image = 4384402990})
 		end
 	end
 
@@ -3443,17 +3440,6 @@ if CEnabled and Main:FindFirstChild('Notice') then
 
 	TweenService:Create(Main.Notice, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 280, 0, 35), Position = UDim2.new(0.5, 0, 0, -50), BackgroundTransparency = 0.5}):Play()
 	TweenService:Create(Main.Notice.Title, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 0.1}):Play()
-end
-
-if not useStudio then
-	local success, result = pcall(function()
-		loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusSoftwareLtd/Sirius/refs/heads/request/boost.lua'))()
-	end)
-
-	if not success then
-		print('Error with boost file.')
-		print(result)
-	end
 end
 
 task.delay(4, function()
