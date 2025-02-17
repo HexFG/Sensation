@@ -78,6 +78,7 @@ local function loadSettings()
 							if file[categoryName][settingName] then
 								setting.Value = file[categoryName][settingName].Value
 								setting.Element:Set(setting.Value, true)
+								print(setting.Value)
 							end
 						end
 					end
@@ -782,7 +783,7 @@ local function LoadConfiguration(Configuration)
 	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
 		local FlagValue = Data[FlagName]
 
-		if FlagValue and not Flag.Ext then
+		if ((typeof(FlagValue) == 'boolean' and FlagValue == false) or FlagValue) and not Flag.Ext then
 			task.spawn(function()
 				if Flag.Type == "ColorPicker" then
 					changed = true
