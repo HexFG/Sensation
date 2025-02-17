@@ -2864,7 +2864,7 @@ function Window:CreateTab(Name, Image, Ext)
 		UserInputService.InputBegan:Connect(function(input, processed)
 			if CheckingForKey then
 				if input.KeyCode ~= Enum.KeyCode.Unknown then
-					if input.KeyCode == Enum.KeyCode.Backspace or Enum.KeyCode.Tab or Enum.KeyCode.Escape then
+					if input.KeyCode == Enum.KeyCode.Backspace or input.KeyCode == Enum.KeyCode.Tab or input.KeyCode == Enum.KeyCode.Escape then
 						KeybindSettings:Set("")
 						return
 					end
@@ -2929,7 +2929,7 @@ function Window:CreateTab(Name, Image, Ext)
 			Keybind.KeybindFrame.KeybindBox.Text = tostring(NewKeybind)
 			KeybindSettings.CurrentKeybind = tostring(NewKeybind)
 			Keybind.KeybindFrame.KeybindBox:ReleaseFocus()
-			
+
 			if not KeybindSettings.Ext and not noSave then
 				SaveConfiguration()
 			end
