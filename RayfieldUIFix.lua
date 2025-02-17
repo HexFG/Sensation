@@ -2059,6 +2059,7 @@ function Window:CreateTab(Name, Image, Ext)
 		end
 
 		setDisplay()
+
 		ColorPicker.HexInput.InputBox.FocusLost:Connect(function()
 			if not pcall(function()
 				local r, g, b = string.match(ColorPicker.HexInput.InputBox.Text, "^#?(%w%w)(%w%w)(%w%w)$")
@@ -2069,13 +2070,16 @@ function Window:CreateTab(Name, Image, Ext)
 				ColorPickerSettings.Color = rgbColor
 			end) 
 			then 
-			ColorPicker.HexInput.InputBox.Text = hex 
+			ColorPicker.HexInput.InputBox.Text =
+			 hex 
 			end
 			pcall(function()ColorPickerSettings.Callback(Color3.fromHSV(h,s,v))end)
+
 			local r,g,b = math.floor((h*255)+0.5),math.floor((s*255)+0.5),math.floor((v*255)+0.5)
 			ColorPickerSettings.Color = Color3.fromRGB(r,g,b)
+
 			if not ColorPickerSettings.Ext then
-			SaveConfiguration(ColorPickerSettings.Flag..'\n'..tostring(ColorPickerSettings.Color))
+				SaveConfiguration(ColorPickerSettings.Flag..'\n'..tostring(ColorPickerSettings.Color))
 			end
 		end)
 
@@ -2176,9 +2180,7 @@ function Window:CreateTab(Name, Image, Ext)
 
 			setDisplay()
 
-			if not ColorPickerSettings.Ext and not noSave then
-				SaveConfiguration()
-			end
+			pcall(function() ColorPickerSettings.Callback(Color3.fromHSV(h,s,v)) end)
 		end
 
 		ColorPicker.MouseEnter:Connect(function()
