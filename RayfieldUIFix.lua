@@ -78,7 +78,7 @@ local function loadSettings()
 							if file[categoryName][settingName] then
 								setting.Value = file[categoryName][settingName].Value
 								setting.Element:Set(setting.Value, true)
-								print(setting.Value)
+								print("Load Settings:", setting.Value)
 							end
 						end
 					end
@@ -778,12 +778,14 @@ local function LoadConfiguration(Configuration)
 	local changed
 
 	if not success then return end
-
+	print("Load config 1")
 	-- Iterate through current UI elements' flags
 	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
 		local FlagValue = Data[FlagName]
 
 		if ((typeof(FlagValue) == 'boolean' and FlagValue == false) or FlagValue) and not Flag.Ext then
+			print(Flag.Name, FlagValue)
+
 			task.spawn(function()
 				if Flag.Type == "ColorPicker" then
 					changed = true
@@ -3528,8 +3530,12 @@ function RayfieldLibrary:LoadConfiguration()
 				loaded = LoadConfiguration(config)
 				return
 			end
-
+			
 			if isfile then 
+				if not isfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension) then
+					SaveConfiguration()
+				end
+
 				if isfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension) then
 					loaded = LoadConfiguration(readfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension))
 				end
