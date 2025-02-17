@@ -76,8 +76,6 @@ local function loadSettings()
 					if file[categoryName] then
 						for settingName, setting in pairs(settingCategory) do
 							if file[categoryName][settingName] then
-								print("Load Settings:", setting.Value)
-
 								setting.Value = file[categoryName][settingName].Value
 								setting.Element:Set(setting.Value, true)
 							end
@@ -1339,7 +1337,6 @@ local function createSettings(window)
 
 	-- Create sections and elements
 	for categoryName, settingCategory in pairs(settingsTable) do
-		print("Create settings", categoryName, settingCategory)
 		newTab:CreateSection(categoryName)
 
 		for _, setting in pairs(settingCategory) do
@@ -1375,7 +1372,6 @@ local function createSettings(window)
 					Flag = setting.Flag,
 					Ext = true, 
 					Callback = function(option)
-						print("Set theme")
 						setting.Value = option
 						updateSettings()
 
@@ -1554,7 +1550,7 @@ if (Settings.KeySystem) then
 			Settings.KeySettings.Key[i] = string.gsub(Settings.KeySettings.Key[i], " ", "")
 			end)
 			if not Success then
-			print("Duck Hub | "..Key.." Error " ..tostring(Response))
+			print(Key.." Error " ..tostring(Response))
 			end
 		end
 	end
