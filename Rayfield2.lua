@@ -76,9 +76,10 @@ local function loadSettings()
 					if file[categoryName] then
 						for settingName, setting in pairs(settingCategory) do
 							if file[categoryName][settingName] then
+								print("Load Settings:", setting.Value)
+
 								setting.Value = file[categoryName][settingName].Value
 								setting.Element:Set(setting.Value, true)
-								print("Load Settings:", setting.Value)
 							end
 						end
 					end
@@ -778,23 +779,18 @@ local function LoadConfiguration(Configuration)
 	local changed
 
 	if not success then return end
-	print("Load config 1")
+
 	-- Iterate through current UI elements' flags
 	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
 		local FlagValue = Data[FlagName]
 
 		if ((typeof(FlagValue) == 'boolean' and FlagValue == false) or FlagValue) and not Flag.Ext then
-			print(Flag.Name, FlagValue)
-
 			task.spawn(function()
 				if Flag.Type == "ColorPicker" then
 					changed = true
 					Flag:Set(UnpackColor(FlagValue), true)
 				else
-					if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) then 
-						changed = true
-						Flag:Set(FlagValue, true) 	
-					end
+					Flag:Set(FlagValue, true) 	
 				end
 			end)
 		end
@@ -1343,6 +1339,7 @@ local function createSettings(window)
 
 	-- Create sections and elements
 	for categoryName, settingCategory in pairs(settingsTable) do
+		print("Create settings", categoryName, settingCategory)
 		newTab:CreateSection(categoryName)
 
 		for _, setting in pairs(settingCategory) do
