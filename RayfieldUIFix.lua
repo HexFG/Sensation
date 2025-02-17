@@ -1345,25 +1345,25 @@ local function createSettings(window)
 		for _, setting in pairs(settingCategory) do
 			if setting.Type == 'input' then
 				setting.Element = newTab:CreateInput({
-				Name = setting.Name,
-				CurrentValue = setting.Value,
-				PlaceholderText = setting.Placeholder,
-				Ext = true,
-				RemoveTextAfterFocusLost = setting.ClearOnFocus,
-				Callback = function(Value)
-					setting.Value = Value
-					updateSettings()
-				end,
+					Name = setting.Name,
+					CurrentValue = setting.Value,
+					PlaceholderText = setting.Placeholder,
+					Ext = true,
+					RemoveTextAfterFocusLost = setting.ClearOnFocus,
+					Callback = function(Value)
+						setting.Value = Value
+						updateSettings()
+					end,
 				})
 			elseif setting.Type == 'toggle' then
 				setting.Element = newTab:CreateToggle({
-				Name = setting.Name,
-				CurrentValue = setting.Value,
-				Ext = true,
-				Callback = function(Value)
-					setting.Value = Value
-					updateSettings()
-				end,
+					Name = setting.Name,
+					CurrentValue = setting.Value,
+					Ext = true,
+					Callback = function(Value)
+						setting.Value = Value
+						updateSettings()
+					end,
 				})
 
 			elseif setting.Type == 'dropdown' then
@@ -1376,7 +1376,7 @@ local function createSettings(window)
 					Ext = true, 
 					Callback = function(option)
 						print("Set theme")
-						setting.Value = option[1]
+						setting.Value = option
 						updateSettings()
 
 						if setting.Name == "Themes" then
@@ -2118,45 +2118,48 @@ function Window:CreateTab(Name, Image, Ext)
 
 		RunService.RenderStepped:connect(function()
 			if mainDragging then 
-			local localX = math.clamp(mouse.X-Main.AbsolutePosition.X,0,Main.AbsoluteSize.X)
-			local localY = math.clamp(mouse.Y-Main.AbsolutePosition.Y,0,Main.AbsoluteSize.Y)
-			Main.MainPoint.Position = UDim2.new(0,localX-Main.MainPoint.AbsoluteSize.X/2,0,localY-Main.MainPoint.AbsoluteSize.Y/2)
-			s = localX / Main.AbsoluteSize.X
-			v = 1 - (localY / Main.AbsoluteSize.Y)
-			Display.BackgroundColor3 = Color3.fromHSV(h,s,v)
-			Main.MainPoint.ImageColor3 = Color3.fromHSV(h,s,v)
-			Background.BackgroundColor3 = Color3.fromHSV(h,1,1)
-			local color = Color3.fromHSV(h,s,v) 
-			local r,g,b = math.floor((color.R*255)+0.5),math.floor((color.G*255)+0.5),math.floor((color.B*255)+0.5)
-			ColorPicker.RGB.RInput.InputBox.Text = tostring(r)
-			ColorPicker.RGB.GInput.InputBox.Text = tostring(g)
-			ColorPicker.RGB.BInput.InputBox.Text = tostring(b)
-			ColorPicker.HexInput.InputBox.Text = string.format("#%02X%02X%02X",color.R*0xFF,color.G*0xFF,color.B*0xFF)
-			pcall(function()ColorPickerSettings.Callback(Color3.fromHSV(h,s,v))end)
-			ColorPickerSettings.Color = Color3.fromRGB(r,g,b)
-			if not ColorPickerSettings.Ext then
-				SaveConfiguration()
-			end
+				local localX = math.clamp(mouse.X-Main.AbsolutePosition.X,0,Main.AbsoluteSize.X)
+				local localY = math.clamp(mouse.Y-Main.AbsolutePosition.Y,0,Main.AbsoluteSize.Y)
+				Main.MainPoint.Position = UDim2.new(0,localX-Main.MainPoint.AbsoluteSize.X/2,0,localY-Main.MainPoint.AbsoluteSize.Y/2)
+				s = localX / Main.AbsoluteSize.X
+				v = 1 - (localY / Main.AbsoluteSize.Y)
+				Display.BackgroundColor3 = Color3.fromHSV(h,s,v)
+				Main.MainPoint.ImageColor3 = Color3.fromHSV(h,s,v)
+				Background.BackgroundColor3 = Color3.fromHSV(h,1,1)
+				local color = Color3.fromHSV(h,s,v) 
+				local r,g,b = math.floor((color.R*255)+0.5),math.floor((color.G*255)+0.5),math.floor((color.B*255)+0.5)
+				ColorPicker.RGB.RInput.InputBox.Text = tostring(r)
+				ColorPicker.RGB.GInput.InputBox.Text = tostring(g)
+				ColorPicker.RGB.BInput.InputBox.Text = tostring(b)
+				ColorPicker.HexInput.InputBox.Text = string.format("#%02X%02X%02X",color.R*0xFF,color.G*0xFF,color.B*0xFF)
+
+				pcall(function()ColorPickerSettings.Callback(Color3.fromHSV(h,s,v))end)
+
+				ColorPickerSettings.Color = Color3.fromRGB(r,g,b)
+
+				if not ColorPickerSettings.Ext then
+					SaveConfiguration()
+				end
 			end
 			if sliderDragging then 
-			local localX = math.clamp(mouse.X-Slider.AbsolutePosition.X,0,Slider.AbsoluteSize.X)
-			h = localX / Slider.AbsoluteSize.X
-			Display.BackgroundColor3 = Color3.fromHSV(h,s,v)
-			Slider.SliderPoint.Position = UDim2.new(0,localX-Slider.SliderPoint.AbsoluteSize.X/2,0.5,0)
-			Slider.SliderPoint.ImageColor3 = Color3.fromHSV(h,1,1)
-			Background.BackgroundColor3 = Color3.fromHSV(h,1,1)
-			Main.MainPoint.ImageColor3 = Color3.fromHSV(h,s,v)
-			local color = Color3.fromHSV(h,s,v) 
-			local r,g,b = math.floor((color.R*255)+0.5),math.floor((color.G*255)+0.5),math.floor((color.B*255)+0.5)
-			ColorPicker.RGB.RInput.InputBox.Text = tostring(r)
-			ColorPicker.RGB.GInput.InputBox.Text = tostring(g)
-			ColorPicker.RGB.BInput.InputBox.Text = tostring(b)
-			ColorPicker.HexInput.InputBox.Text = string.format("#%02X%02X%02X",color.R*0xFF,color.G*0xFF,color.B*0xFF)
-			pcall(function()ColorPickerSettings.Callback(Color3.fromHSV(h,s,v))end)
-			ColorPickerSettings.Color = Color3.fromRGB(r,g,b)
-			if not ColorPickerSettings.Ext then
-				SaveConfiguration()
-			end
+				local localX = math.clamp(mouse.X-Slider.AbsolutePosition.X,0,Slider.AbsoluteSize.X)
+				h = localX / Slider.AbsoluteSize.X
+				Display.BackgroundColor3 = Color3.fromHSV(h,s,v)
+				Slider.SliderPoint.Position = UDim2.new(0,localX-Slider.SliderPoint.AbsoluteSize.X/2,0.5,0)
+				Slider.SliderPoint.ImageColor3 = Color3.fromHSV(h,1,1)
+				Background.BackgroundColor3 = Color3.fromHSV(h,1,1)
+				Main.MainPoint.ImageColor3 = Color3.fromHSV(h,s,v)
+				local color = Color3.fromHSV(h,s,v) 
+				local r,g,b = math.floor((color.R*255)+0.5),math.floor((color.G*255)+0.5),math.floor((color.B*255)+0.5)
+				ColorPicker.RGB.RInput.InputBox.Text = tostring(r)
+				ColorPicker.RGB.GInput.InputBox.Text = tostring(g)
+				ColorPicker.RGB.BInput.InputBox.Text = tostring(b)
+				ColorPicker.HexInput.InputBox.Text = string.format("#%02X%02X%02X",color.R*0xFF,color.G*0xFF,color.B*0xFF)
+				pcall(function()ColorPickerSettings.Callback(Color3.fromHSV(h,s,v))end)
+				ColorPickerSettings.Color = Color3.fromRGB(r,g,b)
+				if not ColorPickerSettings.Ext then
+					SaveConfiguration()
+				end
 			end
 		end)
 
@@ -2174,7 +2177,7 @@ function Window:CreateTab(Name, Image, Ext)
 			setDisplay()
 
 			if not ColorPickerSettings.Ext and not noSave then
-				SaveConfiguration(ColorPickerSettings.Flag..'\n'..tostring(ColorPickerSettings.Color))
+				SaveConfiguration()
 			end
 		end
 
@@ -3362,156 +3365,157 @@ local success, result = pcall(function()
 end)
 
 if not success then warn('An issue when creating settings has occured.') end
-return Window
+	return Window
 end
 
 local function setVisibility(visibility: boolean, notify: boolean?)
-if Debounce then return end
-if visibility then
-	Hidden = false
-	Unhide()
-else
-	Hidden = true
-	Hide(notify)
-end
-end
-
-function RayfieldLibrary:SetVisibility(visibility: boolean)
-setVisibility(visibility, false)
-end
-
-function RayfieldLibrary:IsVisible(): boolean
-return not Hidden
-end
-
-local hideHotkeyConnection -- Has to be initialized here since the connection is made later in the script
-function RayfieldLibrary:Destroy()
-hideHotkeyConnection:Disconnect()
-Rayfield:Destroy()
-end
-
-Topbar.ChangeSize.MouseButton1Click:Connect(function()
-if Debounce then return end
-if Minimised then
-	Minimised = false
-	Maximise()
-else
-	Minimised = true
-	Minimise()
-end
-end)
-
-Main.Search.Input:GetPropertyChangedSignal('Text'):Connect(function()
-if #Main.Search.Input.Text > 0 then
-	if not Elements.UIPageLayout.CurrentPage:FindFirstChild('SearchTitle-fsefsefesfsefesfesfThanks') then 
-		local searchTitle = Elements.Template.SectionTitle:Clone()
-		searchTitle.Parent = Elements.UIPageLayout.CurrentPage
-		searchTitle.Name = 'SearchTitle-fsefsefesfsefesfesfThanks'
-		searchTitle.LayoutOrder = -100
-		searchTitle.Title.Text = "Results from '"..Elements.UIPageLayout.CurrentPage.Name.."'"
-		searchTitle.Visible = true
-	end
-else
-	local searchTitle = Elements.UIPageLayout.CurrentPage:FindFirstChild('SearchTitle-fsefsefesfsefesfesfThanks')
-
-	if searchTitle then
-		searchTitle:Destroy()
-	end
-end
-
-for _, element in ipairs(Elements.UIPageLayout.CurrentPage:GetChildren()) do
-	if element.ClassName ~= 'UIListLayout' and element.Name ~= 'Placeholder' and element.Name ~= 'SearchTitle-fsefsefesfsefesfesfThanks' then
-		if element.Name == 'SectionTitle' then
-			if #Main.Search.Input.Text == 0 then
-			element.Visible = true
-			else
-			element.Visible = false
-			end
-		else
-			if string.lower(element.Name):find(string.lower(Main.Search.Input.Text), 1, true) then
-			element.Visible = true
-			else
-			element.Visible = false
-			end
-		end
-	end
-end
-end)
-
-Main.Search.Input.FocusLost:Connect(function(enterPressed)
-if #Main.Search.Input.Text == 0 and searchOpen then
-	task.wait(0.12)
-	closeSearch()
-end
-end)
-
-Topbar.Search.MouseButton1Click:Connect(function()
-task.spawn(function()
-	if searchOpen then
-		closeSearch()
-	else
-		openSearch()
-	end
-end)
-end)
-
-if Topbar:FindFirstChild('Settings') then
-Topbar.Settings.MouseButton1Click:Connect(function()
-	task.spawn(function()
-		for _, OtherTabButton in ipairs(TabList:GetChildren()) do
-			if OtherTabButton.Name ~= "Template" and OtherTabButton.ClassName == "Frame" and OtherTabButton ~= TabButton and OtherTabButton.Name ~= "Placeholder" then
-			TweenService:Create(OtherTabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.TabBackground}):Play()
-			TweenService:Create(OtherTabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextColor3 = SelectedTheme.TabTextColor}):Play()
-			TweenService:Create(OtherTabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageColor3 = SelectedTheme.TabTextColor}):Play()
-			TweenService:Create(OtherTabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
-			TweenService:Create(OtherTabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0.2}):Play()
-			TweenService:Create(OtherTabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.2}):Play()
-			TweenService:Create(OtherTabButton.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0.5}):Play()
-			end
-		end
-
-		Elements.UIPageLayout:JumpTo(Elements['Settings'])
-	end)
-end)
-end
-
-Topbar.Hide.MouseButton1Click:Connect(function()
-setVisibility(Hidden, not useMobileSizing)
-end)
-
-hideHotkeyConnection = UserInputService.InputBegan:Connect(function(input, processed)
-if (input.KeyCode == Enum.KeyCode[settingsTable.General.rayfieldOpen.Value or 'K'] and not processed) then
 	if Debounce then return end
-	if Hidden then
+	if visibility then
 		Hidden = false
 		Unhide()
 	else
 		Hidden = true
-		Hide()
+		Hide(notify)
 	end
 end
+
+function RayfieldLibrary:SetVisibility(visibility: boolean)
+	setVisibility(visibility, false)
+end
+
+function RayfieldLibrary:IsVisible(): boolean
+	return not Hidden
+end
+
+local hideHotkeyConnection -- Has to be initialized here since the connection is made later in the script
+function RayfieldLibrary:Destroy()
+	hideHotkeyConnection:Disconnect()
+	Rayfield:Destroy()
+end
+
+Topbar.ChangeSize.MouseButton1Click:Connect(function()
+	if Debounce then return end
+
+	if Minimised then
+		Minimised = false
+		Maximise()
+	else
+		Minimised = true
+		Minimise()
+	end
+end)
+
+Main.Search.Input:GetPropertyChangedSignal('Text'):Connect(function()
+	if #Main.Search.Input.Text > 0 then
+		if not Elements.UIPageLayout.CurrentPage:FindFirstChild('SearchTitle-fsefsefesfsefesfesfThanks') then 
+			local searchTitle = Elements.Template.SectionTitle:Clone()
+			searchTitle.Parent = Elements.UIPageLayout.CurrentPage
+			searchTitle.Name = 'SearchTitle-fsefsefesfsefesfesfThanks'
+			searchTitle.LayoutOrder = -100
+			searchTitle.Title.Text = "Results from '"..Elements.UIPageLayout.CurrentPage.Name.."'"
+			searchTitle.Visible = true
+		end
+	else
+		local searchTitle = Elements.UIPageLayout.CurrentPage:FindFirstChild('SearchTitle-fsefsefesfsefesfesfThanks')
+
+		if searchTitle then
+			searchTitle:Destroy()
+		end
+	end
+
+	for _, element in ipairs(Elements.UIPageLayout.CurrentPage:GetChildren()) do
+		if element.ClassName ~= 'UIListLayout' and element.Name ~= 'Placeholder' and element.Name ~= 'SearchTitle-fsefsefesfsefesfesfThanks' then
+			if element.Name == 'SectionTitle' then
+				if #Main.Search.Input.Text == 0 then
+				element.Visible = true
+				else
+				element.Visible = false
+				end
+			else
+				if string.lower(element.Name):find(string.lower(Main.Search.Input.Text), 1, true) then
+				element.Visible = true
+				else
+				element.Visible = false
+				end
+			end
+		end
+	end
+end)
+
+Main.Search.Input.FocusLost:Connect(function(enterPressed)
+	if #Main.Search.Input.Text == 0 and searchOpen then
+		task.wait(0.12)
+		closeSearch()
+	end
+end)
+
+Topbar.Search.MouseButton1Click:Connect(function()
+	task.spawn(function()
+		if searchOpen then
+			closeSearch()
+		else
+			openSearch()
+		end
+	end)
+end)
+
+if Topbar:FindFirstChild('Settings') then
+	Topbar.Settings.MouseButton1Click:Connect(function()
+		task.spawn(function()
+			for _, OtherTabButton in ipairs(TabList:GetChildren()) do
+				if OtherTabButton.Name ~= "Template" and OtherTabButton.ClassName == "Frame" and OtherTabButton ~= TabButton and OtherTabButton.Name ~= "Placeholder" then
+				TweenService:Create(OtherTabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.TabBackground}):Play()
+				TweenService:Create(OtherTabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextColor3 = SelectedTheme.TabTextColor}):Play()
+				TweenService:Create(OtherTabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageColor3 = SelectedTheme.TabTextColor}):Play()
+				TweenService:Create(OtherTabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
+				TweenService:Create(OtherTabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0.2}):Play()
+				TweenService:Create(OtherTabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.2}):Play()
+				TweenService:Create(OtherTabButton.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0.5}):Play()
+				end
+			end
+
+			Elements.UIPageLayout:JumpTo(Elements['Settings'])
+		end)
+	end)
+end
+
+Topbar.Hide.MouseButton1Click:Connect(function()
+	setVisibility(Hidden, not useMobileSizing)
+end)
+
+hideHotkeyConnection = UserInputService.InputBegan:Connect(function(input, processed)
+	if (input.KeyCode == Enum.KeyCode[settingsTable.General.rayfieldOpen.Value or 'K'] and not processed) then
+		if Debounce then return end
+		if Hidden then
+			Hidden = false
+			Unhide()
+		else
+			Hidden = true
+			Hide()
+		end
+	end
 end)
 
 if MPrompt then
-MPrompt.Interact.MouseButton1Click:Connect(function()
-	if Debounce then return end
-	if Hidden then
-		Hidden = false
-		Unhide()
-	end
-end)
+	MPrompt.Interact.MouseButton1Click:Connect(function()
+		if Debounce then return end
+		if Hidden then
+			Hidden = false
+			Unhide()
+		end
+	end)
 end
 
 for _, TopbarButton in ipairs(Topbar:GetChildren()) do
-if TopbarButton.ClassName == "ImageButton" and TopbarButton.Name ~= 'Icon' then
-	TopbarButton.MouseEnter:Connect(function()
-		TweenService:Create(TopbarButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
-	end)
+	if TopbarButton.ClassName == "ImageButton" and TopbarButton.Name ~= 'Icon' then
+		TopbarButton.MouseEnter:Connect(function()
+			TweenService:Create(TopbarButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
+		end)
 
-	TopbarButton.MouseLeave:Connect(function()
-		TweenService:Create(TopbarButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.8}):Play()
-	end)
-end
+		TopbarButton.MouseLeave:Connect(function()
+			TweenService:Create(TopbarButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.8}):Play()
+		end)
+	end
 end
 
 function RayfieldLibrary:LoadConfiguration()
@@ -3548,24 +3552,24 @@ function RayfieldLibrary:LoadConfiguration()
 end
 
 if CEnabled and Main:FindFirstChild('Notice') then
-Main.Notice.BackgroundTransparency = 1
-Main.Notice.Title.TextTransparency = 1
-Main.Notice.Size = UDim2.new(0, 0, 0, 0)
-Main.Notice.Position = UDim2.new(0.5, 0, 0, -100)
-Main.Notice.Visible = true
+	Main.Notice.BackgroundTransparency = 1
+	Main.Notice.Title.TextTransparency = 1
+	Main.Notice.Size = UDim2.new(0, 0, 0, 0)
+	Main.Notice.Position = UDim2.new(0.5, 0, 0, -100)
+	Main.Notice.Visible = true
 
-TweenService:Create(Main.Notice, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 280, 0, 35), Position = UDim2.new(0.5, 0, 0, -50), BackgroundTransparency = 0.5}):Play()
-TweenService:Create(Main.Notice.Title, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 0.1}):Play()
+	TweenService:Create(Main.Notice, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 280, 0, 35), Position = UDim2.new(0.5, 0, 0, -50), BackgroundTransparency = 0.5}):Play()
+	TweenService:Create(Main.Notice.Title, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 0.1}):Play()
 end
 
 task.delay(4, function()
-if Main:FindFirstChild('Notice') and Main.Notice.Visible then
-	TweenService:Create(Main.Notice, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 100, 0, 25), Position = UDim2.new(0.5, 0, 0, -100), BackgroundTransparency = 1}):Play()
-	TweenService:Create(Main.Notice.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
+	if Main:FindFirstChild('Notice') and Main.Notice.Visible then
+		TweenService:Create(Main.Notice, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 100, 0, 25), Position = UDim2.new(0.5, 0, 0, -100), BackgroundTransparency = 1}):Play()
+		TweenService:Create(Main.Notice.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 
-	task.wait(0.5)
-	Main.Notice.Visible = false
-end
+		task.wait(0.5)
+		Main.Notice.Visible = false
+	end
 end)
 
 return RayfieldLibrary
