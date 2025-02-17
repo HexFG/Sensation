@@ -21,8 +21,8 @@ local ConfigurationExtension = ".cfg"
 local settingsTable = {
 	General = {
 		-- if needs be in order just make getSetting(name)
-		rayfieldOpen = {Type = 'bind', Value = 'K', Name = 'UI Keybind'},
-		rayfieldThemes = {Type = 'dropdown', Value = "Default", CurrentOption = "Default", Options = {"Default", "Fatality", "Ocean", "AmberGlow", "Light", "Amethyst", "Green", "Bloom", "DarkBlue", "Serenity"}, Name = "Themes", MultipleOptions = false},
+		rayfieldOpen = {Type = 'bind', Value = 'RightShift', Name = 'UI Keybind', Flag = "menuKeybind"},
+		rayfieldThemes = {Type = 'dropdown', Value = "Default", CurrentOption = "Default", Options = {"Default", "Fatality", "Ocean", "AmberGlow", "Light", "Amethyst", "Green", "Bloom", "DarkBlue", "Serenity"}, Name = "Themes", MultipleOptions = false, Flag = "menuThemes"},
 		-- buildwarnings
 		-- rayfieldprompts
 	},
@@ -765,11 +765,11 @@ end)
 end
 
 local function PackColor(Color)
-return {R = Color.R * 255, G = Color.G * 255, B = Color.B * 255}
+	return {R = Color.R * 255, G = Color.G * 255, B = Color.B * 255}
 end    
 
 local function UnpackColor(Color)
-return Color3.fromRGB(Color.R, Color.G, Color.B)
+	return Color3.fromRGB(Color.R, Color.G, Color.B)
 end
 
 local function LoadConfiguration(Configuration)
@@ -782,13 +782,13 @@ local function LoadConfiguration(Configuration)
 	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
 		local FlagValue = Data[FlagName]
 
-		if (typeof(FlagValue) == 'boolean' and FlagValue == false) or FlagValue then
+		if FlagValue and not Flag.Ext then
 			task.spawn(function()
 				if Flag.Type == "ColorPicker" then
 					changed = true
 					Flag:Set(UnpackColor(FlagValue))
 				else
-					if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue then 
+					if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) then 
 						changed = true
 						Flag:Set(FlagValue) 	
 					end
@@ -1321,93 +1321,94 @@ local function updateSettings()
 end
 
 local function createSettings(window)
-if not (writefile and isfile and readfile and isfolder and makefolder) and not useStudio then
-	if Topbar['Settings'] then Topbar.Settings.Visible = false end
-	Topbar['Search'].Position = UDim2.new(1, -75, 0.5, 0)
-	warn('Can\'t create settings as no file-saving functionality is available.')
-	return
-end
+	if not (writefile and isfile and readfile and isfolder and makefolder) and not useStudio then
+		if Topbar['Settings'] then Topbar.Settings.Visible = false end
+		Topbar['Search'].Position = UDim2.new(1, -75, 0.5, 0)
+		warn('Can\'t create settings as no file-saving functionality is available.')
+		return
+	end
 
-local newTab = window:CreateTab('Settings', 0, true)
+	local newTab = window:CreateTab('Settings', 0, true)
 
-if TabList['Settings'] then
-	TabList['Settings'].LayoutOrder = 1000
-end
+	if TabList['Settings'] then
+		TabList['Settings'].LayoutOrder = 1000
+	end
 
-if Elements['Settings'] then
-	Elements['Settings'].LayoutOrder = 1000
-end
+	if Elements['Settings'] then
+		Elements['Settings'].LayoutOrder = 1000
+	end
 
--- Create sections and elements
-for categoryName, settingCategory in pairs(settingsTable) do
-	newTab:CreateSection(categoryName)
+	-- Create sections and elements
+	for categoryName, settingCategory in pairs(settingsTable) do
+		newTab:CreateSection(categoryName)
 
-	for _, setting in pairs(settingCategory) do
-		if setting.Type == 'input' then
-			setting.Element = newTab:CreateInput({
-			Name = setting.Name,
-			CurrentValue = setting.Value,
-			PlaceholderText = setting.Placeholder,
-			Ext = true,
-			RemoveTextAfterFocusLost = setting.ClearOnFocus,
-			Callback = function(Value)
-				setting.Value = Value
-				updateSettings()
-			end,
-			})
-		elseif setting.Type == 'toggle' then
-			setting.Element = newTab:CreateToggle({
-			Name = setting.Name,
-			CurrentValue = setting.Value,
-			Ext = true,
-			Callback = function(Value)
-				setting.Value = Value
-				updateSettings()
-			end,
-			})
-
-		elseif setting.Type == 'dropdown' then
-			setting.Element = newTab:CreateDropdown({
-				Name = setting.Name, 
-				Options = setting.Options,
-				CurrentOption = setting.Value, 
-				MultipleOptions = setting.MultipleOptions, 
-				Ext = true, 
-				Callback = function(option)
-					print(option[1])
-					setting.Value = option[1]
+		for _, setting in pairs(settingCategory) do
+			if setting.Type == 'input' then
+				setting.Element = newTab:CreateInput({
+				Name = setting.Name,
+				CurrentValue = setting.Value,
+				PlaceholderText = setting.Placeholder,
+				Ext = true,
+				RemoveTextAfterFocusLost = setting.ClearOnFocus,
+				Callback = function(Value)
+					setting.Value = Value
 					updateSettings()
+				end,
+				})
+			elseif setting.Type == 'toggle' then
+				setting.Element = newTab:CreateToggle({
+				Name = setting.Name,
+				CurrentValue = setting.Value,
+				Ext = true,
+				Callback = function(Value)
+					setting.Value = Value
+					updateSettings()
+				end,
+				})
 
-					if setting.Name == "Themes" then
-						local success = pcall(ChangeTheme, option[1])
-						if not success then
-							RayfieldLibrary:Notify({Title = 'Unable to Change Theme', Content = 'We are unable find a theme on file.', Image = 4400704299})
-						else
-							RayfieldLibrary:Notify({Title = 'Theme Changed', Content = 'Successfully changed theme to '..(typeof(option[1]) == 'string' and option[1] or 'Custom Theme')..'.', Image = 4483362748})
+			elseif setting.Type == 'dropdown' then
+				setting.Element = newTab:CreateDropdown({
+					Name = setting.Name, 
+					Options = setting.Options,
+					CurrentOption = setting.Value, 
+					MultipleOptions = setting.MultipleOptions, 
+					Flag = setting.Flag,
+					Ext = true, 
+					Callback = function(option)
+						setting.Value = option[1]
+						updateSettings()
+
+						if setting.Name == "Themes" then
+							local success = pcall(ChangeTheme, option[1])
+							if not success then
+								RayfieldLibrary:Notify({Title = 'Unable to Change Theme', Content = 'We are unable find a theme on file.', Image = 4400704299})
+							else
+								RayfieldLibrary:Notify({Title = 'Theme Changed', Content = 'Successfully changed theme to '..(typeof(option[1]) == 'string' and option[1] or 'Custom Theme')..'.', Image = 4483362748})
+							end
 						end
 					end
-				end
-			})
+				})
 
-		elseif setting.Type == 'bind' then
-			setting.Element = newTab:CreateKeybind({
-			Name = setting.Name,
-			CurrentKeybind = setting.Value,
-			HoldToInteract = false,
-			Ext = true,
-			CallOnChange = true,
-			Callback = function(Value)
-				setting.Value = Value
-				updateSettings()
-			end,
-			})
+			elseif setting.Type == 'bind' then
+				setting.Element = newTab:CreateKeybind({
+					Name = setting.Name,
+					CurrentKeybind = setting.Value,
+					HoldToInteract = false,
+					Ext = true,
+					Flag = setting.Flag,
+					CallOnChange = true,
+					Callback = function(Value)
+						setting.Value = Value
+						updateSettings()
+					end,
+				})
+			end
 		end
 	end
-end
 
-settingsCreated = true
-loadSettings()
-updateSettings()
+	settingsCreated = true
+	loadSettings()
+	updateSettings()
 end
 
 function RayfieldLibrary:CreateWindow(Settings)
@@ -3506,34 +3507,34 @@ end
 end
 
 function RayfieldLibrary:LoadConfiguration()
-local config
+	local config
 
-if debugX then
-	warn('Loading Configuration')
-end
+	if debugX then
+		warn('Loading Configuration')
+	end
 
-if useStudio then
-	config = [[{"Toggle1adwawd":true,"ColorPicker1awd":{"B":255,"G":255,"R":255},"Slider1dawd":100,"ColorPicfsefker1":{"B":255,"G":255,"R":255},"Slidefefsr1":80,"dawdawd":"","Input1":"hh","Keybind1":"B","Dropdown1":["Ocean"]}]]
-end
+	if useStudio then
+		config = [[{"Toggle1adwawd":true,"ColorPicker1awd":{"B":255,"G":255,"R":255},"Slider1dawd":100,"ColorPicfsefker1":{"B":255,"G":255,"R":255},"Slidefefsr1":80,"dawdawd":"","Input1":"hh","Keybind1":"B","Dropdown1":["Ocean"]}]]
+	end
 
-if CEnabled then
-	local loaded
+	if CEnabled then
+		local loaded
 
-	local success, result = pcall(function()
-		if useStudio and config then
-			loaded = LoadConfiguration(config)
-			return
-		end
-
-		if isfile then 
-			if isfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension) then
-			loaded = LoadConfiguration(readfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension))
+		local success, result = pcall(function()
+			if useStudio and config then
+				loaded = LoadConfiguration(config)
+				return
 			end
-		end
-	end)
-end
 
-globalLoaded = true
+			if isfile then 
+				if isfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension) then
+					loaded = LoadConfiguration(readfile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension))
+				end
+			end
+		end)
+	end
+
+	globalLoaded = true
 end
 
 if CEnabled and Main:FindFirstChild('Notice') then
