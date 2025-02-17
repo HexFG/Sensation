@@ -17,15 +17,15 @@ local InterfaceBuild = 'Duck1'
 local Release = "Build 69420"
 local RayfieldFolder = "Duck"
 local ConfigurationFolder = RayfieldFolder.."/Configurations"
-local ConfigurationExtension = ".rfld"
+local ConfigurationExtension = ".cfg"
 local settingsTable = {
-General = {
-	-- if needs be in order just make getSetting(name)
-	rayfieldOpen = {Type = 'bind', Value = 'K', Name = 'UI Keybind'},
-	rayfieldThemes = {Type = 'dropdown', CurrentOption = "Fatality", Options = {"Default", "Fatality", "Ocean", "AmberGlow", "Light", "Amethyst", "Green", "Bloom", "DarkBlue", "Serenity"}, Name = "Themes", MultipleOptions = false},
-	-- buildwarnings
-	-- rayfieldprompts
-},
+	General = {
+		-- if needs be in order just make getSetting(name)
+		rayfieldOpen = {Type = 'bind', Value = 'K', Name = 'UI Keybind'},
+		rayfieldThemes = {Type = 'dropdown', CurrentOption = "Fatality", Options = {"Default", "Fatality", "Ocean", "AmberGlow", "Light", "Amethyst", "Green", "Bloom", "DarkBlue", "Serenity"}, Name = "Themes", MultipleOptions = false},
+		-- buildwarnings
+		-- rayfieldprompts
+	},
 }
 
 local HttpService = cloneref(game:GetService("HttpService"))
@@ -44,23 +44,23 @@ local success, result =	pcall(function()
 	task.spawn(function()
 		if isfolder and isfolder(RayfieldFolder) then
 			if isfile and isfile(RayfieldFolder..'/settings'..ConfigurationExtension) then
-			file = readfile(RayfieldFolder..'/settings'..ConfigurationExtension)
+				file = readfile(RayfieldFolder..'/settings'..ConfigurationExtension)
 			end
 		end
 
 		-- for debug in studio
 		if useStudio then
 			file = [[
-	{"General":{"rayfieldOpen":{"Value":"K","Type":"bind","Name":"Rayfield Keybind","Element":{"HoldToInteract":false,"Ext":true,"Name":"Rayfield Keybind","Set":null,"CallOnChange":true,"Callback":null,"CurrentKeybind":"K"}}},"System":{"usageAnalytics":{"Value":false,"Type":"toggle","Name":"Anonymised Analytics","Element":{"Ext":true,"Name":"Anonymised Analytics","Set":null,"CurrentValue":false,"Callback":null}}}}
-]]
+				{"General":{"rayfieldOpen":{"Value":"K","Type":"bind","Name":"Rayfield Keybind","Element":{"HoldToInteract":false,"Ext":true,"Name":"Rayfield Keybind","Set":null,"CallOnChange":true,"Callback":null,"CurrentKeybind":"K"}}},"System":{"usageAnalytics":{"Value":false,"Type":"toggle","Name":"Anonymised Analytics","Element":{"Ext":true,"Name":"Anonymised Analytics","Set":null,"CurrentValue":false,"Callback":null}}}}
+			]]
 		end
 
 		if file then
 			local success, decodedFile = pcall(function() return HttpService:JSONDecode(file) end)
 			if success then
-			file = decodedFile
+				file = decodedFile
 			else
-			file = {}
+				file = {}
 			end
 		else
 			file = {}
@@ -73,14 +73,14 @@ local success, result =	pcall(function()
 
 		if file ~= {} then
 			for categoryName, settingCategory in pairs(settingsTable) do
-			if file[categoryName] then
-				for settingName, setting in pairs(settingCategory) do
-					if file[categoryName][settingName] then
-						setting.Value = file[categoryName][settingName].Value
-						setting.Element:Set(setting.Value)
+				if file[categoryName] then
+					for settingName, setting in pairs(settingCategory) do
+						if file[categoryName][settingName] then
+							setting.Value = file[categoryName][settingName].Value
+							setting.Element:Set(setting.Value)
+						end
 					end
 				end
-			end
 			end
 		end
 	end)
@@ -773,80 +773,80 @@ return Color3.fromRGB(Color.R, Color.G, Color.B)
 end
 
 local function LoadConfiguration(Configuration)
-local success, Data = pcall(function() return HttpService:JSONDecode(Configuration) end)
-local changed
+	local success, Data = pcall(function() return HttpService:JSONDecode(Configuration) end)
+	local changed
 
-if not success then return end
+	if not success then return end
 
--- Iterate through current UI elements' flags
-for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
-	local FlagValue = Data[FlagName]
+	-- Iterate through current UI elements' flags
+	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
+		local FlagValue = Data[FlagName]
 
-	if (typeof(FlagValue) == 'boolean' and FlagValue == false) or FlagValue then
-		task.spawn(function()
-			if Flag.Type == "ColorPicker" then
-			changed = true
-			Flag:Set(UnpackColor(FlagValue))
-			else
-			if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue then 
-				changed = true
-				Flag:Set(FlagValue) 	
-			end
-			end
-		end)
+		if (typeof(FlagValue) == 'boolean' and FlagValue == false) or FlagValue then
+			task.spawn(function()
+				if Flag.Type == "ColorPicker" then
+					changed = true
+					Flag:Set(UnpackColor(FlagValue))
+				else
+					if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue then 
+						changed = true
+						Flag:Set(FlagValue) 	
+					end
+				end
+			end)
+		end
 	end
-end
 
-return changed
+	return changed
 end
 
 local function SaveConfiguration()
-if not CEnabled or not globalLoaded then return end
+	if not CEnabled or not globalLoaded then return end
 
-if debugX then
-	print('Saving')
-end
+	if debugX then
+		print('Saving')
+	end
 
-local Data = {}
-for i, v in pairs(RayfieldLibrary.Flags) do
-	if v.Type == "ColorPicker" then
-		Data[i] = PackColor(v.Color)
-	else
-		if typeof(v.CurrentValue) == 'boolean' then
-			if v.CurrentValue == false then
-			Data[i] = false
-			else
-			Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
-			end
+	local Data = {}
+	for i, v in pairs(RayfieldLibrary.Flags) do
+		if v.Type == "ColorPicker" then
+			Data[i] = PackColor(v.Color)
 		else
-			Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
+			if typeof(v.CurrentValue) == 'boolean' then
+				if v.CurrentValue == false then
+				Data[i] = false
+				else
+				Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
+				end
+			else
+				Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
+			end
 		end
 	end
-end
 
-if useStudio then
-	if script.Parent:FindFirstChild('configuration') then script.Parent.configuration:Destroy() end
+	if useStudio then
+		if script.Parent:FindFirstChild('configuration') then script.Parent.configuration:Destroy() end
 
-	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.Parent = script.Parent
-	ScreenGui.Name = 'configuration'
+		local ScreenGui = Instance.new("ScreenGui")
+		ScreenGui.Parent = script.Parent
+		ScreenGui.Name = 'configuration'
 
-	local TextBox = Instance.new("TextBox")
-	TextBox.Parent = ScreenGui
-	TextBox.Size = UDim2.new(0, 800, 0, 50)
-	TextBox.AnchorPoint = Vector2.new(0.5, 0)
-	TextBox.Position = UDim2.new(0.5, 0, 0, 30)
-	TextBox.Text = HttpService:JSONEncode(Data)
-	TextBox.ClearTextOnFocus = false
-end
+		local TextBox = Instance.new("TextBox")
+		TextBox.Parent = ScreenGui
+		TextBox.Size = UDim2.new(0, 800, 0, 50)
+		TextBox.AnchorPoint = Vector2.new(0.5, 0)
+		TextBox.Position = UDim2.new(0.5, 0, 0, 30)
+		TextBox.Text = HttpService:JSONEncode(Data)
+		TextBox.ClearTextOnFocus = false
+	end
 
-if debugX then
-	warn(HttpService:JSONEncode(Data))
-end
+	if debugX then
+		warn(HttpService:JSONEncode(Data))
+	end
 
-if writefile then
-	writefile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension, tostring(HttpService:JSONEncode(Data)))
-end
+	if writefile then
+		writefile(ConfigurationFolder .. "/" .. CFileName .. ConfigurationExtension, tostring(HttpService:JSONEncode(Data)))
+	end
 end
 
 function RayfieldLibrary:Notify(data) -- action e.g open messages
@@ -1303,21 +1303,21 @@ Debounce = false
 end
 
 local function updateSettings()
-local encoded
-local success, err = pcall(function()
-	encoded = HttpService:JSONEncode(settingsTable)
-end)
+	local encoded
+	local success, err = pcall(function()
+		encoded = HttpService:JSONEncode(settingsTable)
+	end)
 
-if success then
-	if useStudio then
-		if script.Parent['get.val'] then
-			script.Parent['get.val'].Value = encoded
+	if success then
+		if useStudio then
+			if script.Parent['get.val'] then
+				script.Parent['get.val'].Value = encoded
+			end
+		end
+		if writefile then
+			writefile(RayfieldFolder..'/settings'..ConfigurationExtension, encoded)
 		end
 	end
-	if writefile then
-		writefile(RayfieldFolder..'/settings'..ConfigurationExtension, encoded)
-	end
-end
 end
 
 local function createSettings(window)
@@ -2449,11 +2449,11 @@ function Window:CreateTab(Name, Image, Ext)
 			InputSettings.CurrentValue = text
 
 			local Success, Response = pcall(function()
-			InputSettings.Callback(text)
+				InputSettings.Callback(text)
 			end)
 
 			if not InputSettings.Ext then
-			SaveConfiguration()
+				SaveConfiguration()
 			end
 		end
 
@@ -2723,47 +2723,48 @@ function Window:CreateTab(Name, Image, Ext)
 			DropdownSettings.CurrentOption = NewOption
 
 			if typeof(DropdownSettings.CurrentOption) == "string" then
-			DropdownSettings.CurrentOption = {DropdownSettings.CurrentOption}
+				DropdownSettings.CurrentOption = {DropdownSettings.CurrentOption}
 			end
 
 			if not DropdownSettings.MultipleOptions then
-			DropdownSettings.CurrentOption = {DropdownSettings.CurrentOption[1]}
+				DropdownSettings.CurrentOption = {DropdownSettings.CurrentOption[1]}
 			end
 
 			if DropdownSettings.MultipleOptions then
-			if #DropdownSettings.CurrentOption == 1 then
+				if #DropdownSettings.CurrentOption == 1 then
+					Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+				elseif #DropdownSettings.CurrentOption == 0 then
+					Dropdown.Selected.Text = "None"
+				else
+					Dropdown.Selected.Text = "Various"
+				end
+			else
 				Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
-			elseif #DropdownSettings.CurrentOption == 0 then
-				Dropdown.Selected.Text = "None"
-			else
-				Dropdown.Selected.Text = "Various"
-			end
-			else
-			Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
 			end
 
 			local Success, Response = pcall(function()
-			DropdownSettings.Callback(NewOption)
+				DropdownSettings.Callback(NewOption)
 			end)
+
 			if not Success then
-			TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
-			TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
-			Dropdown.Title.Text = "Callback Error"
-			print(DropdownSettings.Name.." Callback Error " ..tostring(Response))
-			task.wait(0.5)
-			Dropdown.Title.Text = DropdownSettings.Name
-			TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
-			TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+				TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
+				TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+				Dropdown.Title.Text = "Callback Error"
+				print(DropdownSettings.Name.." Callback Error " ..tostring(Response))
+				task.wait(0.5)
+				Dropdown.Title.Text = DropdownSettings.Name
+				TweenService:Create(Dropdown, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+				TweenService:Create(Dropdown.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
 			end
 
 			for _, droption in ipairs(Dropdown.List:GetChildren()) do
-			if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
-				if not table.find(DropdownSettings.CurrentOption, droption.Name) then
-					droption.BackgroundColor3 = SelectedTheme.DropdownUnselected
-				else
-					droption.BackgroundColor3 = SelectedTheme.DropdownSelected
+				if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
+					if not table.find(DropdownSettings.CurrentOption, droption.Name) then
+						droption.BackgroundColor3 = SelectedTheme.DropdownUnselected
+					else
+						droption.BackgroundColor3 = SelectedTheme.DropdownSelected
+					end
 				end
-			end
 			end
 			--SaveConfiguration()
 		end
