@@ -75,7 +75,7 @@ local function getBoundingBox(parts)
 end
 
 local function worldToScreen(world)
-	local screen, inBounds = wtvp(camera, world);
+	local screen, inBounds = camera:WorldToViewportPoint(world);
 	return Vector2.new(screen.X, screen.Y), inBounds, screen.Z;
 end
 
