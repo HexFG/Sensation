@@ -2856,6 +2856,8 @@ function Window:CreateTab(Name, Image, Ext)
 		end)
 
 		UserInputService.InputBegan:Connect(function(input, processed)
+			if KeybindSettings.CurrentKeybind == nil or KeybindSettings.CurrentKeybind == "" or KeybindSettings.CurrentKeybind == " " then return end
+			
 			if CheckingForKey then
 				if input.KeyCode ~= Enum.KeyCode.Unknown then
 					local SplitMessage = string.split(tostring(input.KeyCode), ".")
