@@ -2830,7 +2830,7 @@ function Window:CreateTab(Name, Image, Ext)
 		TweenService:Create(Keybind.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
 		TweenService:Create(Keybind.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
 
-		Keybind.KeybindFrame.KeybindBox.Text = KeybindSettings.CurrentKeybind
+		Keybind.KeybindFrame.KeybindBox.Text = KeybindSettings.CurrentKeybind or ""
 		Keybind.KeybindFrame.Size = UDim2.new(0, Keybind.KeybindFrame.KeybindBox.TextBounds.X + 24, 0, 30)
 
 		Keybind.KeybindFrame.KeybindBox.Focused:Connect(function()
@@ -2840,7 +2840,7 @@ function Window:CreateTab(Name, Image, Ext)
 		Keybind.KeybindFrame.KeybindBox.FocusLost:Connect(function()
 			CheckingForKey = false
 			if Keybind.KeybindFrame.KeybindBox.Text == nil or "" then
-			Keybind.KeybindFrame.KeybindBox.Text = KeybindSettings.CurrentKeybind
+			Keybind.KeybindFrame.KeybindBox.Text = KeybindSettings.CurrentKeybind or ""
 			if not KeybindSettings.Ext then
 				SaveConfiguration()
 			end
