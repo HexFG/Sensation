@@ -77,7 +77,7 @@ local function loadSettings()
 						for settingName, setting in pairs(settingCategory) do
 							if file[categoryName][settingName] then
 								setting.Value = file[categoryName][settingName].Value
-								setting.Element:Set(setting.Value)
+								setting.Element:Set(setting.Value, true)
 							end
 						end
 					end
@@ -786,11 +786,11 @@ local function LoadConfiguration(Configuration)
 			task.spawn(function()
 				if Flag.Type == "ColorPicker" then
 					changed = true
-					Flag:Set(UnpackColor(FlagValue))
+					Flag:Set(UnpackColor(FlagValue), true)
 				else
 					if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) then 
 						changed = true
-						Flag:Set(FlagValue) 	
+						Flag:Set(FlagValue, true) 	
 					end
 				end
 			end)
@@ -814,9 +814,9 @@ local function SaveConfiguration()
 		else
 			if typeof(v.CurrentValue) == 'boolean' then
 				if v.CurrentValue == false then
-				Data[i] = false
+					Data[i] = false
 				else
-				Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
+					Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
 				end
 			else
 				Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
@@ -1918,7 +1918,7 @@ function Window:CreateTab(Name, Image, Ext)
 			TweenService:Create(Button.ElementIndicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {TextTransparency = 0.9}):Play()
 		end)
 
-		function ButtonValue:Set(NewButton)
+		function ButtonValue:Set(NewButton, noSave)
 			Button.Title.Text = NewButton
 			Button.Name = NewButton
 		end
@@ -2165,7 +2165,7 @@ function Window:CreateTab(Name, Image, Ext)
 			end
 		end
 
-		function ColorPickerSettings:Set(RGBColor)
+		function ColorPickerSettings:Set(RGBColor, noSave)
 			ColorPickerSettings.Color = RGBColor
 			h,s,v = ColorPickerSettings.Color:ToHSV()
 			color = Color3.fromHSV(h,s,v)
@@ -2213,7 +2213,7 @@ function Window:CreateTab(Name, Image, Ext)
 		Section.Title.TextTransparency = 1
 		TweenService:Create(Section.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0.4}):Play()
 
-		function SectionValue:Set(NewSection)
+		function SectionValue:Set(NewSection, noSave)
 			Section.Title.Text = NewSection
 		end
 
@@ -2232,7 +2232,7 @@ function Window:CreateTab(Name, Image, Ext)
 		Divider.Divider.BackgroundTransparency = 1
 		TweenService:Create(Divider.Divider, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.85}):Play()
 
-		function DividerValue:Set(Value)
+		function DividerValue:Set(Value, noSave)
 			Divider.Visible = Value
 		end
 
@@ -2364,7 +2364,7 @@ function Window:CreateTab(Name, Image, Ext)
 		TweenService:Create(Paragraph.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
 		TweenService:Create(Paragraph.Content, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()	
 
-		function ParagraphValue:Set(NewParagraphSettings)
+		function ParagraphValue:Set(NewParagraphSettings, noSave)
 			Paragraph.Title.Text = NewParagraphSettings.Title
 			Paragraph.Content.Text = NewParagraphSettings.Content
 		end
@@ -2446,7 +2446,7 @@ function Window:CreateTab(Name, Image, Ext)
 			TweenService:Create(Input.InputFrame, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = UDim2.new(0, Input.InputFrame.InputBox.TextBounds.X + 24, 0, 30)}):Play()
 		end)
 
-		function InputSettings:Set(text)
+		function InputSettings:Set(text, noSave)
 			Input.InputFrame.InputBox.Text = text
 			InputSettings.CurrentValue = text
 
@@ -2454,7 +2454,7 @@ function Window:CreateTab(Name, Image, Ext)
 				InputSettings.Callback(text)
 			end)
 
-			if not InputSettings.Ext then
+			if not InputSettings.Ext and not noSave then
 				SaveConfiguration()
 			end
 		end
@@ -2721,7 +2721,7 @@ function Window:CreateTab(Name, Image, Ext)
 			end
 		end
 
-		function DropdownSettings:Set(NewOption)
+		function DropdownSettings:Set(NewOption, noSave)
 			DropdownSettings.CurrentOption = NewOption
 
 			if typeof(DropdownSettings.CurrentOption) == "string" then
@@ -2768,7 +2768,9 @@ function Window:CreateTab(Name, Image, Ext)
 					end
 				end
 			end
-			--SaveConfiguration()
+			if not DropdownSettings.Ext and not noSave then
+				SaveConfiguration()
+			end
 		end
 
 		function DropdownSettings:Refresh(optionsTable: table) -- updates a dropdown with new options from optionsTable
@@ -2783,7 +2785,7 @@ function Window:CreateTab(Name, Image, Ext)
 
 		if Settings.ConfigurationSaving then
 			if Settings.ConfigurationSaving.Enabled and DropdownSettings.Flag then
-			RayfieldLibrary.Flags[DropdownSettings.Flag] = DropdownSettings
+				RayfieldLibrary.Flags[DropdownSettings.Flag] = DropdownSettings
 			end
 		end
 
@@ -2904,12 +2906,12 @@ function Window:CreateTab(Name, Image, Ext)
 			TweenService:Create(Keybind.KeybindFrame, TweenInfo.new(0.55, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = UDim2.new(0, Keybind.KeybindFrame.KeybindBox.TextBounds.X + 24, 0, 30)}):Play()
 		end)
 
-		function KeybindSettings:Set(NewKeybind)
+		function KeybindSettings:Set(NewKeybind, noSave)
 			Keybind.KeybindFrame.KeybindBox.Text = tostring(NewKeybind)
 			KeybindSettings.CurrentKeybind = tostring(NewKeybind)
 			Keybind.KeybindFrame.KeybindBox:ReleaseFocus()
-			if not KeybindSettings.Ext then
-			SaveConfiguration()
+			if not KeybindSettings.Ext and not noSave then
+				SaveConfiguration()
 			end
 
 			if KeybindSettings.CallOnChange then
@@ -3024,7 +3026,7 @@ function Window:CreateTab(Name, Image, Ext)
 			end
 		end)
 
-		function ToggleSettings:Set(NewToggleValue)
+		function ToggleSettings:Set(NewToggleValue, noSave)
 			if NewToggleValue == true then
 			ToggleSettings.CurrentValue = true
 			TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackgroundHover}):Play()
@@ -3068,8 +3070,8 @@ function Window:CreateTab(Name, Image, Ext)
 			TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
 			end
 
-			if not ToggleSettings.Ext then
-			SaveConfiguration()
+			if not ToggleSettings.Ext and not noSave then
+				SaveConfiguration()
 			end
 		end
 
@@ -3235,14 +3237,14 @@ function Window:CreateTab(Name, Image, Ext)
 			end)
 		end)
 
-		function SliderSettings:Set(NewVal)
+		function SliderSettings:Set(NewVal, noSave)
 			local NewVal = math.clamp(NewVal, SliderSettings.Range[1], SliderSettings.Range[2])
 
 			TweenService:Create(Slider.Main.Progress, TweenInfo.new(0.45, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = UDim2.new(0, Slider.Main.AbsoluteSize.X * ((NewVal + SliderSettings.Range[1]) / (SliderSettings.Range[2] - SliderSettings.Range[1])) > 5 and Slider.Main.AbsoluteSize.X * (NewVal / (SliderSettings.Range[2] - SliderSettings.Range[1])) or 5, 1, 0)}):Play()
 			Slider.Main.Information.Text = tostring(NewVal) .. " " .. (SliderSettings.Suffix or "")
 
 			local Success, Response = pcall(function()
-			SliderSettings.Callback(NewVal)
+				SliderSettings.Callback(NewVal)
 			end)
 
 			if not Success then
@@ -3257,20 +3259,20 @@ function Window:CreateTab(Name, Image, Ext)
 			end
 
 			SliderSettings.CurrentValue = NewVal
-			if not SliderSettings.Ext then
-			SaveConfiguration()
+			if not SliderSettings.Ext and not noSave then
+				SaveConfiguration()
 			end
 		end
 
 		if Settings.ConfigurationSaving then
 			if Settings.ConfigurationSaving.Enabled and SliderSettings.Flag then
-			RayfieldLibrary.Flags[SliderSettings.Flag] = SliderSettings
+				RayfieldLibrary.Flags[SliderSettings.Flag] = SliderSettings
 			end
 		end
 
 		Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
 			if SelectedTheme ~= RayfieldLibrary.Theme["Default"] then
-			Slider.Main.Shadow.Visible = false
+				Slider.Main.Shadow.Visible = false
 			end
 
 			Slider.Main.BackgroundColor3 = SelectedTheme.SliderBackground
@@ -3278,7 +3280,7 @@ function Window:CreateTab(Name, Image, Ext)
 			Slider.Main.Progress.UIStroke.Color = SelectedTheme.SliderStroke
 			Slider.Main.Progress.BackgroundColor3 = SelectedTheme.SliderProgress
 		end)
-
+		
 		return SliderSettings
 	end
 
