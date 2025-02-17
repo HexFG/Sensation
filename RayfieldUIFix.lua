@@ -2864,15 +2864,20 @@ function Window:CreateTab(Name, Image, Ext)
 		UserInputService.InputBegan:Connect(function(input, processed)
 			if CheckingForKey then
 				if input.KeyCode ~= Enum.KeyCode.Unknown then
+					if input.KeyCode == Enum.KeyCode.Backspace or Enum.KeyCode.Tab or Enum.KeyCode.Escape then
+						KeybindSettings:Set("")
+						return
+					end
+
 					local SplitMessage = string.split(tostring(input.KeyCode), ".")
 					local NewKeyNoEnum = SplitMessage[3]
 					Keybind.KeybindFrame.KeybindBox.Text = tostring(NewKeyNoEnum)
 					KeybindSettings.CurrentKeybind = tostring(NewKeyNoEnum)
 					Keybind.KeybindFrame.KeybindBox:ReleaseFocus()
+
 					if not KeybindSettings.Ext then
 						SaveConfiguration()
 					end
-
 					if KeybindSettings.CallOnChange then
 						KeybindSettings.Callback(tostring(NewKeyNoEnum))
 					end
@@ -2924,12 +2929,13 @@ function Window:CreateTab(Name, Image, Ext)
 			Keybind.KeybindFrame.KeybindBox.Text = tostring(NewKeybind)
 			KeybindSettings.CurrentKeybind = tostring(NewKeybind)
 			Keybind.KeybindFrame.KeybindBox:ReleaseFocus()
+			
 			if not KeybindSettings.Ext and not noSave then
 				SaveConfiguration()
 			end
 
 			if KeybindSettings.CallOnChange then
-			KeybindSettings.Callback(tostring(NewKeybind))
+				KeybindSettings.Callback(tostring(NewKeybind))
 			end
 		end
 
