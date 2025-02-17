@@ -76,9 +76,10 @@ local function loadSettings()
 					if file[categoryName] then
 						for settingName, setting in pairs(settingCategory) do
 							if file[categoryName][settingName] then
+								print("Load Settings:", setting.Value)
+
 								setting.Value = file[categoryName][settingName].Value
 								setting.Element:Set(setting.Value, true)
-								print("Load Settings:", setting.Value)
 							end
 						end
 					end
@@ -492,7 +493,7 @@ local RayfieldLibrary = {
 			TextColor = Color3.fromRGB(180, 180, 190),
 			Background = Color3.fromRGB(8, 14, 30),
 			Topbar = Color3.fromRGB(10, 24, 42),
-			Shadow = Color3.fromRGB(200, 210, 220),
+			Shadow = Color3.fromRGB(10, 24, 42),
 
 			NotificationBackground = Color3.fromRGB(8, 14, 30),
 			NotificationActionsBackground = Color3.fromRGB(8, 14, 30),
@@ -778,23 +779,18 @@ local function LoadConfiguration(Configuration)
 	local changed
 
 	if not success then return end
-	print("Load config 1")
+
 	-- Iterate through current UI elements' flags
 	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
 		local FlagValue = Data[FlagName]
 
 		if ((typeof(FlagValue) == 'boolean' and FlagValue == false) or FlagValue) and not Flag.Ext then
-			print(Flag.Name, FlagValue)
-
 			task.spawn(function()
 				if Flag.Type == "ColorPicker" then
 					changed = true
 					Flag:Set(UnpackColor(FlagValue), true)
 				else
-					if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) then 
-						changed = true
-						Flag:Set(FlagValue, true) 	
-					end
+					Flag:Set(FlagValue, true) 	
 				end
 			end)
 		end
@@ -804,7 +800,7 @@ local function LoadConfiguration(Configuration)
 end
 
 local function SaveConfiguration()
-	if not CEnabled or not globalLoaded then return end
+	if not CEnabled then return end
 
 	if debugX then
 		print('Saving')
@@ -1343,6 +1339,7 @@ local function createSettings(window)
 
 	-- Create sections and elements
 	for categoryName, settingCategory in pairs(settingsTable) do
+		print("Create settings", categoryName, settingCategory)
 		newTab:CreateSection(categoryName)
 
 		for _, setting in pairs(settingCategory) do
@@ -1373,11 +1370,12 @@ local function createSettings(window)
 				setting.Element = newTab:CreateDropdown({
 					Name = setting.Name, 
 					Options = setting.Options,
-					CurrentOption = setting.Value, 
+					CurrentOption = {setting.Value}, 
 					MultipleOptions = setting.MultipleOptions, 
 					Flag = setting.Flag,
 					Ext = true, 
 					Callback = function(option)
+						print("Set theme")
 						setting.Value = option[1]
 						updateSettings()
 
@@ -2172,7 +2170,12 @@ function Window:CreateTab(Name, Image, Ext)
 			ColorPickerSettings.Color = RGBColor
 			h,s,v = ColorPickerSettings.Color:ToHSV()
 			color = Color3.fromHSV(h,s,v)
+
 			setDisplay()
+
+			if not ColorPickerSettings.Ext and not noSave then
+				SaveConfiguration(ColorPickerSettings.Flag..'\n'..tostring(ColorPickerSettings.Color))
+			end
 		end
 
 		ColorPicker.MouseEnter:Connect(function()
@@ -3542,8 +3545,6 @@ function RayfieldLibrary:LoadConfiguration()
 			end
 		end)
 	end
-
-	globalLoaded = true
 end
 
 if CEnabled and Main:FindFirstChild('Notice') then
