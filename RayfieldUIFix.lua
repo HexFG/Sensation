@@ -2807,7 +2807,7 @@ function Window:CreateTab(Name, Image, Ext)
 	-- Keybind
 	function Tab:CreateKeybind(KeybindSettings)
 		KeybindSettings.Name = KeybindSettings.Name or "Keybind"
-		KeybindSettings.CurrentKeybind = KeybindSettings.CurrentKeybind or "K"
+		KeybindSettings.CurrentKeybind = KeybindSettings.CurrentKeybind or nil
 		KeybindSettings.HoldToInteract = KeybindSettings.HoldToInteract or false
 		KeybindSettings.Flag = KeybindSettings.Flag or "key1"
 		KeybindSettings.Callback = KeybindSettings.Callback or (function() end)
@@ -2857,55 +2857,55 @@ function Window:CreateTab(Name, Image, Ext)
 
 		UserInputService.InputBegan:Connect(function(input, processed)
 			if CheckingForKey then
-			if input.KeyCode ~= Enum.KeyCode.Unknown then
-				local SplitMessage = string.split(tostring(input.KeyCode), ".")
-				local NewKeyNoEnum = SplitMessage[3]
-				Keybind.KeybindFrame.KeybindBox.Text = tostring(NewKeyNoEnum)
-				KeybindSettings.CurrentKeybind = tostring(NewKeyNoEnum)
-				Keybind.KeybindFrame.KeybindBox:ReleaseFocus()
-				if not KeybindSettings.Ext then
-					SaveConfiguration()
-				end
+				if input.KeyCode ~= Enum.KeyCode.Unknown then
+					local SplitMessage = string.split(tostring(input.KeyCode), ".")
+					local NewKeyNoEnum = SplitMessage[3]
+					Keybind.KeybindFrame.KeybindBox.Text = tostring(NewKeyNoEnum)
+					KeybindSettings.CurrentKeybind = tostring(NewKeyNoEnum)
+					Keybind.KeybindFrame.KeybindBox:ReleaseFocus()
+					if not KeybindSettings.Ext then
+						SaveConfiguration()
+					end
 
-				if KeybindSettings.CallOnChange then
-					KeybindSettings.Callback(tostring(NewKeyNoEnum))
+					if KeybindSettings.CallOnChange then
+						KeybindSettings.Callback(tostring(NewKeyNoEnum))
+					end
 				end
-			end
 			elseif not KeybindSettings.CallOnChange and KeybindSettings.CurrentKeybind ~= nil and (input.KeyCode == Enum.KeyCode[KeybindSettings.CurrentKeybind] and not processed) then -- Test
-			local Held = true
-			local Connection
-			Connection = input.Changed:Connect(function(prop)
-				if prop == "UserInputState" then
-					Connection:Disconnect()
-					Held = false
-				end
-			end)
+				local Held = true
+				local Connection
+				Connection = input.Changed:Connect(function(prop)
+					if prop == "UserInputState" then
+						Connection:Disconnect()
+						Held = false
+					end
+				end)
 
-			if not KeybindSettings.HoldToInteract then
-				local Success, Response = pcall(KeybindSettings.Callback)
-				if not Success then
-					TweenService:Create(Keybind, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
-					TweenService:Create(Keybind.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
-					Keybind.Title.Text = "Callback Error"
-					print(KeybindSettings.Name.." Callback Error " ..tostring(Response))
-					task.wait(0.5)
-					Keybind.Title.Text = KeybindSettings.Name
-					TweenService:Create(Keybind, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
-					TweenService:Create(Keybind.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+				if not KeybindSettings.HoldToInteract then
+					local Success, Response = pcall(KeybindSettings.Callback)
+					if not Success then
+						TweenService:Create(Keybind, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = Color3.fromRGB(85, 0, 0)}):Play()
+						TweenService:Create(Keybind.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+						Keybind.Title.Text = "Callback Error"
+						print(KeybindSettings.Name.." Callback Error " ..tostring(Response))
+						task.wait(0.5)
+						Keybind.Title.Text = KeybindSettings.Name
+						TweenService:Create(Keybind, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
+						TweenService:Create(Keybind.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+					end
+				else
+					task.wait(0.25)
+					if Held then
+						local Loop; Loop = RunService.Stepped:Connect(function()
+							if not Held then
+								KeybindSettings.Callback(false) -- maybe pcall this
+								Loop:Disconnect()
+							else
+								KeybindSettings.Callback(true) -- maybe pcall this
+							end
+						end)
+					end
 				end
-			else
-				task.wait(0.25)
-				if Held then
-					local Loop; Loop = RunService.Stepped:Connect(function()
-						if not Held then
-						KeybindSettings.Callback(false) -- maybe pcall this
-						Loop:Disconnect()
-						else
-						KeybindSettings.Callback(true) -- maybe pcall this
-						end
-					end)
-				end
-			end
 			end
 		end)
 
