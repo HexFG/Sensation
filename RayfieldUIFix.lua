@@ -2840,10 +2840,10 @@ function Window:CreateTab(Name, Image, Ext)
 		Keybind.KeybindFrame.KeybindBox.FocusLost:Connect(function()
 			CheckingForKey = false
 			if Keybind.KeybindFrame.KeybindBox.Text == nil or "" then
-			Keybind.KeybindFrame.KeybindBox.Text = KeybindSettings.CurrentKeybind or ""
-			if not KeybindSettings.Ext then
-				SaveConfiguration()
-			end
+				Keybind.KeybindFrame.KeybindBox.Text = KeybindSettings.CurrentKeybind or ""
+				if not KeybindSettings.Ext then
+					SaveConfiguration()
+				end
 			end
 		end)
 
@@ -2856,8 +2856,6 @@ function Window:CreateTab(Name, Image, Ext)
 		end)
 
 		UserInputService.InputBegan:Connect(function(input, processed)
-			if KeybindSettings.CurrentKeybind == nil or KeybindSettings.CurrentKeybind == "" or KeybindSettings.CurrentKeybind == " " then return end
-			
 			if CheckingForKey then
 				if input.KeyCode ~= Enum.KeyCode.Unknown then
 					local SplitMessage = string.split(tostring(input.KeyCode), ".")
@@ -2873,7 +2871,8 @@ function Window:CreateTab(Name, Image, Ext)
 						KeybindSettings.Callback(tostring(NewKeyNoEnum))
 					end
 				end
-			elseif not KeybindSettings.CallOnChange and KeybindSettings.CurrentKeybind ~= nil and (input.KeyCode == Enum.KeyCode[KeybindSettings.CurrentKeybind] and not processed) then -- Test
+
+			elseif not KeybindSettings.CallOnChange and KeybindSettings.CurrentKeybind ~= nil and KeybindSettings.CurrentKeybind ~= "" and KeybindSettings.CurrentKeybind ~= " " and (Enum.KeyCode[KeybindSettings.CurrentKeybind] and input.KeyCode == Enum.KeyCode[KeybindSettings.CurrentKeybind] and not processed) then
 				local Held = true
 				local Connection
 				Connection = input.Changed:Connect(function(prop)
