@@ -139,7 +139,8 @@ function esp:Update()
 	self.health, self.maxHealth = interface.getHealth(self.player)
 	self.weapon = interface.getWeapon(self.player)
 	self.enabled = self.options.enabled and self.character and self.health > 0
-
+	if not self.character then return end
+	
 	local head = self.character:FindFirstChild("Head")
 	local root = self.character:FindFirstChild("HumanoidRootPart")
 	if not head or not root or not self.enabled then
