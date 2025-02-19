@@ -133,15 +133,12 @@ end
 
 function esp:Update()
 	local interface = self.interface;
-    print("Update 1")
 
 	self.options = interface.teamSettings[interface.isFriendly(self.player) and "friendly" or "enemy"];
 	self.character = interface.getCharacter(self.player)
 	self.health, self.maxHealth = interface.getHealth(self.player)
 	self.weapon = interface.getWeapon(self.player)
 	self.enabled = self.options.enabled and self.character and self.health > 0
-
-    print("Update 2", self.enabled, self.options.enabled, self.character, self.health > 0)
 
 	local head = self.character:FindFirstChild("Head")
 	local root = self.character:FindFirstChild("HumanoidRootPart")
@@ -150,34 +147,26 @@ function esp:Update()
 		return
 	end
 
-    print("Update 3", self.enabled)
-
     local screenPosition, visible = camera:WorldToViewportPoint(root.Position)
-
-    print("Update 3", screenPosition, visible)
 
     local distance = getDistance(root.Position)
 	self.onScreen = visible
 	self.distance = distance
-
-    print("Update 4", distance)
 
 	if interface.sharedSettings.limitDistance and distance > interface.sharedSettings.maxDistance then
 		self.enabled = false
         return
 	end
 
-    print("Update 5")
-
 	if self.onScreen then
         local scale_factor = 1 / (screenPosition.Z * math.tan(math.rad(camera.FieldOfView * 0.5)) * 2) * 100
         self.width, self.height = math.floor(35 * scale_factor), math.floor(50 * scale_factor)
         self.x, self.y = math.floor(screenPosition.X), math.floor(screenPosition.Y)
 
-        self.top_left = Vector2.new(self.x, self.y)
-        self.top_right = Vector2.new(self.x + self.width, self.y)
-        self.bottom_left = Vector2.new(self.x, self.y + self.height)
-        self.bottom_right = Vector2.new(self.x + self.width, self.y + self.height)
+        self.top_left = Vector2.new(self.x - (0.5 * self.width), self.y - (0.5 * self.height))
+        self.top_right = Vector2.new(self.x + (0.5 * self.width), self.y - (0.5 * self.height))
+        self.bottom_left = Vector2.new(self.x - (0.5 * self.width), self.y + (0.5 * self.height))
+        self.bottom_right = Vector2.new(self.x + (0.5 * self.width), self.y + (0.5 * self.height))
         self.center = Vector2.new(math.floor(self.x - self.width * 0.5), math.floor(self.y - self.height * 0.5))
 
 	elseif self.options.offScreenArrow then
@@ -447,7 +436,6 @@ function EspInterface.Load()
 	assert(not EspInterface._hasLoaded, "Esp has already been loaded.");
 
     for i, plr in next, players:GetPlayers() do
-        print("Added plr", plr)
         esp.new(plr, EspInterface)
     end
 
