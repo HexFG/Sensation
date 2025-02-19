@@ -436,16 +436,19 @@ function EspInterface.Load()
 	assert(not EspInterface._hasLoaded, "Esp has already been loaded.");
 
     for i, plr in next, players:GetPlayers() do
-        esp.new(plr, EspInterface)
+        if plr ~= players.LocalPlayer then
+            esp.new(plr, EspInterface)
+        end
     end
 
     players.PlayerAdded:Connect(function(plr) 
-        esp.new(plr, EspInterface)
+        if plr ~= players.LocalPlayer then
+            esp.new(plr, EspInterface)
+        end
     end)
 
     players.PlayerRemoving:Connect(function(plr) 
         if objects[plr] then
-            print(objects[plr].Destroy)
             objects[plr]:Destroy()
         end
     end)
