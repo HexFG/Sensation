@@ -63,9 +63,9 @@ end
 local function getDistance(pos)
     local char = players.LocalPlayer.Character
 
-    if char and char:FindFirstChild("Root") then
-        if not char:FindFirstChild("Root") then return 0 end
-        return (pos - char:FindFirstChild("Root").CFrame.Position).Magnitude
+    if char then
+        if not char:FindFirstChild("HumanoidRootPart") then return 0 end
+        return (pos - char:FindFirstChild("HumanoidRootPart").CFrame.Position).Magnitude
     end
 end
 
@@ -141,7 +141,7 @@ function esp:Update()
 	self.weapon = interface.getWeapon(self.player)
 	self.enabled = self.options.enabled and self.character and self.health > 0
 
-    print("Update 2", self.enabled)
+    print("Update 2", self.enabled, self.options.enabled, self.character, self.health > 0)
 
 	local head = self.character:FindFirstChild("Head")
 	local root = self.character:FindFirstChild("HumanoidRootPart")
@@ -338,8 +338,6 @@ end
 -- interface
 local EspInterface = {
 	_hasLoaded = false,
-	_objectCache = {},
-	whitelist = {},
 	sharedSettings = {
 		textSize = 13,
 		textFont = 2,
