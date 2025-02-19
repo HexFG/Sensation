@@ -81,7 +81,7 @@ function esp.new(player, interface)
 	self.player = assert(player, "Missing argument #1 (Player expected)")
 	self.interface = assert(interface, "Missing argument #2 (table expected)")
 	self:Create()
-    
+
     objects[self.player] = self
 	return self
 end
@@ -135,6 +135,7 @@ end
 
 function esp:Update()
 	local interface = self.interface;
+    print("Update 1")
 
 	self.options = interface.teamSettings[interface.isFriendly(self.player) and "friendly" or "enemy"];
 	self.character = interface.getCharacter(self.player)
@@ -143,24 +144,33 @@ function esp:Update()
 	self.enabled = self.options.enabled and self.character and not
 		(#interface.whitelist > 0 and not find(interface.whitelist, self.player.UserId)) and self.health > 0
 
-	local head = self.enabled and findFirstChild(self.character, "Head")
-	local root = self.enabled and findFirstChild(self.character, "HumanoidRootPart")
-	if not head or not root then
-		self.charCache = {}
-		self.onScreen = false
+    print("Update 2", self.enabled)
+
+	local head = findFirstChild(self.character, "Head")
+	local root = findFirstChild(self.character, "HumanoidRootPart")
+	if not head or not root or not self.enabled then
+        self.enabled = false
 		return
 	end
 
+    print("Update 3", self.enabled)
+
     local screenPosition, visible = camera:WorldToViewportPoint(root.Position)
+
+    print("Update 3", screenPosition, visible)
 
     local distance = getDistance(root.Position)
 	self.onScreen = visible
 	self.distance = distance
 
+    print("Update 4", distance)
+
 	if interface.sharedSettings.limitDistance and distance > interface.sharedSettings.maxDistance then
 		self.enabled = false
         return
 	end
+
+    print("Update 5")
 
 	if self.onScreen then
         local scale_factor = 1 / (screenPosition.Z * math.tan(math.rad(camera.FieldOfView * 0.5)) * 2) * 100
@@ -442,6 +452,7 @@ function EspInterface.Load()
 	assert(not EspInterface._hasLoaded, "Esp has already been loaded.");
 
     for i, plr in next, players:GetPlayers() do
+        print("Added plr", plr)
         esp.new(plr, EspInterface)
     end
 
@@ -459,45 +470,30 @@ function EspInterface.Load()
 	EspInterface._hasLoaded = true
 end
 
-function EspInterface.Unload()
-	assert(EspInterface._hasLoaded, "Esp has not been loaded yet.");
-
-	for index, object in next, EspInterface._objectCache do
-		for i = 1, #object do
-			object[i]:Destruct();
-		end
-		EspInterface._objectCache[index] = nil;
-	end
-
-	EspInterface.playerAdded:Disconnect();
-	EspInterface.playerRemoving:Disconnect();
-	EspInterface._hasLoaded = false;
-end
-
 -- game specific functions
 function EspInterface.getWeapon(player)
-	return "Unknown";
+	return "Unknown"
 end
 
 function EspInterface.isFriendly(player)
-	return player.Team and player.Team == localPlayer.Team;
+	return player.Team and player.Team == localPlayer.Team
 end
 
 function EspInterface.getTeamColor(player)
-	return player.Team and player.Team.TeamColor and player.Team.TeamColor.Color;
+	return player.Team and player.Team.TeamColor and player.Team.TeamColor.Color
 end
 
 function EspInterface.getCharacter(player)
-	return player.Character;
+	return player.Character
 end
 
 function EspInterface.getHealth(player)
-	local character = player and EspInterface.getCharacter(player);
-	local humanoid = character and findFirstChildOfClass(character, "Humanoid");
+	local character = player and EspInterface.getCharacter(player)
+	local humanoid = character and findFirstChildOfClass(character, "Humanoid")
 	if humanoid then
-		return humanoid.Health, humanoid.MaxHealth;
+		return humanoid.Health, humanoid.MaxHealth
 	end
-	return 100, 100;
+	return 100, 100
 end
 
-return EspInterface;
+return EspInterface
