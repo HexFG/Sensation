@@ -174,10 +174,10 @@ function esp:Update()
         self.width, self.height = math.floor(35 * scale_factor), math.floor(50 * scale_factor)
         self.x, self.y = math.floor(screenPosition.X), math.floor(screenPosition.Y)
 
-        self.top_left = Vector2.new(self.x + (0.5 * self.x), self.y + (0.5 * self.y))
-        self.top_right = Vector2.new(self.x + self.width + (0.5 * self.x), self.y + (0.5 * self.y))
-        self.bottom_left = Vector2.new(self.x + (0.5 * self.x), self.y + self.height + (0.5 * self.y))
-        self.bottom_right = Vector2.new(self.x + self.width + (0.5 * self.x), self.y + self.height + (0.5 * self.y))
+        self.top_left = Vector2.new(self.x + (0.5 * self.width), self.y + (0.5 * self.height))
+        self.top_right = Vector2.new(self.x + self.width, self.y)
+        self.bottom_left = Vector2.new(self.x, self.y + self.height)
+        self.bottom_right = Vector2.new(self.x + self.width, self.y + self.height)
         self.center = Vector2.new(math.floor(self.x - self.width * 0.5), math.floor(self.y - self.height * 0.5))
 
 	elseif self.options.offScreenArrow then
