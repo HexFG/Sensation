@@ -63,9 +63,9 @@ end
 local function getDistance(pos)
     local char = players.LocalPlayer.Character
 
-    if char and char:FindFirstChild("Root") then
-        if not char:FindFirstChild("Root") then return 0 end
-        return (pos - char:FindFirstChild("Root").CFrame.Position).Magnitude
+    if char then
+        if not char:FindFirstChild("HumanoidRootPart") then return 0 end
+        return (pos - char:FindFirstChild("HumanoidRootPart").CFrame.Position).Magnitude
     end
 end
 
@@ -174,10 +174,10 @@ function esp:Update()
         self.width, self.height = math.floor(35 * scale_factor), math.floor(50 * scale_factor)
         self.x, self.y = math.floor(screenPosition.X), math.floor(screenPosition.Y)
 
-        self.top_left = Vector2.new(self.x, self.y)
-        self.top_right = Vector2.new(self.x + self.width, self.y)
-        self.bottom_left = Vector2.new(self.x, self.y + self.height)
-        self.bottom_right = Vector2.new(self.x + self.width, self.y + self.height)
+        self.top_left = Vector2.new(self.x + (0.5 * self.x), self.y + (0.5 * self.y))
+        self.top_right = Vector2.new(self.x + self.width + (0.5 * self.x), self.y + (0.5 * self.y))
+        self.bottom_left = Vector2.new(self.x + (0.5 * self.x), self.y + self.height + (0.5 * self.y))
+        self.bottom_right = Vector2.new(self.x + self.width + (0.5 * self.x), self.y + self.height + (0.5 * self.y))
         self.center = Vector2.new(math.floor(self.x - self.width * 0.5), math.floor(self.y - self.height * 0.5))
 
 	elseif self.options.offScreenArrow then
@@ -338,8 +338,6 @@ end
 -- interface
 local EspInterface = {
 	_hasLoaded = false,
-	_objectCache = {},
-	whitelist = {},
 	sharedSettings = {
 		textSize = 13,
 		textFont = 2,
