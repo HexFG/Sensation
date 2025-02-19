@@ -29,8 +29,6 @@ local fromMatrix = CFrame.fromMatrix;
 local wtvp = camera.WorldToViewportPoint;
 local isA = workspace.IsA;
 local getPivot = workspace.GetPivot;
-local findFirstChild = workspace.FindFirstChild;
-local findFirstChildOfClass = workspace.FindFirstChildOfClass;
 local getChildren = workspace.GetChildren;
 local toOrientation = CFrame.identity.ToOrientation;
 local pointToObjectSpace = CFrame.identity.PointToObjectSpace;
@@ -141,13 +139,12 @@ function esp:Update()
 	self.character = interface.getCharacter(self.player)
 	self.health, self.maxHealth = interface.getHealth(self.player)
 	self.weapon = interface.getWeapon(self.player)
-	self.enabled = self.options.enabled and self.character and not
-		(#interface.whitelist > 0 and not find(interface.whitelist, self.player.UserId)) and self.health > 0
+	self.enabled = self.options.enabled and self.character and self.health > 0
 
     print("Update 2", self.enabled)
 
-	local head = findFirstChild(self.character, "Head")
-	local root = findFirstChild(self.character, "HumanoidRootPart")
+	local head = self.character:FindFirstChild("Head")
+	local root = self.character:FindFirstChild("HumanoidRootPart")
 	if not head or not root or not self.enabled then
         self.enabled = false
 		return
@@ -489,7 +486,7 @@ end
 
 function EspInterface.getHealth(player)
 	local character = player and EspInterface.getCharacter(player)
-	local humanoid = character and findFirstChildOfClass(character, "Humanoid")
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 	if humanoid then
 		return humanoid.Health, humanoid.MaxHealth
 	end
